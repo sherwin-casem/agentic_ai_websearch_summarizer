@@ -1,5 +1,5 @@
-from duckduckgosearch_tool import search_duckduckgo  
-from summarizer_tool import summarize_text  
+from tools.duckduckgo_tool import search_duckduckgo  
+from tools.summarizer_tool import summarize_text  
 
 def run_search_and_summarization(query: str, num_results: int = 5, verbose: bool = True):
     """Performs a DuckDuckGo web search and summarizes results."""
