@@ -1,31 +1,16 @@
-import gradio as gr
-from chains.langgraph_chain import run_chain
+import gradio as gr  
+from main import run_search_and_summarization  # Importing the function
 
-def agentic_ai_interface(query, verbose=True):
-    """
-    Interface function to run the agentic AI chain.
-
-    Args:
-        query (str): User's input query.
-        verbose (bool): Whether to show detailed reasoning.
-
-    Returns:
-        str or dict: Final summary or verbose output.
-    """
-    result = run_chain(query, verbose=verbose)
-    if verbose:
-        return f"🔍 **Search Results:**\n\n" + \
-               "\n".join([f"- {r.get('title', 'No Title')} ({r.get('href', 'No URL')})" for r in result['search_results']]) + \
-               f"\n\n📝 **Summary:**\n\n{result['summary']}"
-    else:
-        return result
+def agentic_ai_interface(query, num_results=5, verbose=True):
+    """Interface function to run the search & summarization."""
+    return run_search_and_summarization(query, num_results, verbose)
 
 # Gradio UI
 iface = gr.Interface(
     fn=agentic_ai_interface,
     inputs=[
         gr.Textbox(label="Enter your query", placeholder="e.g., What is the latest research on quantum computing?"),
-        gr.Checkbox(label="Verbose Output", value=True)
+        gr.Slider(1, 10, value=5, label="Number of search results"),
     ],
     outputs="markdown",
     title="🔗 Agentic AI: Web Search + Summarizer",
