@@ -1,4 +1,4 @@
-from tools.duckduckgo_tool import search_duckduckgo  
+from tools.duckduckgo_tools import search_duckduckgo  
 from tools.summarizer_tool import summarize_text  
 
 def run_search_and_summarization(query: str, num_results: int = 5, verbose: bool = True):
