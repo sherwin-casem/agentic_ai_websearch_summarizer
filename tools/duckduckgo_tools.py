@@ -1,15 +1,21 @@
-from duckduckgo_search import ddg
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
-def search_duckduckgo(query, max_results=5):
+def load_model(model_name="cognitivecomputations/TinyLlama-1.1B-Chat-v1.0"):
     """
-    Perform a DuckDuckGo search and return the results.
+    Load the instruct-tuned LLM model and tokenizer from Hugging Face.
 
     Args:
-        query (str): The search query.
-        max_results (int): Maximum number of results to return.
+        model_name (str): The name of the model to load from Hugging Face.
 
     Returns:
-        list: A list of dictionaries containing the search results.
+        model: The loaded model.
+        tokenizer: The loaded tokenizer.
     """
-    results = ddg(query, max_results=max_results)
-    return results
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForCausalLM.from_pretrained(model_name)
+    return model, tokenizer
+
+# Example usage
+if __name__ == "__main__":
+    model, tokenizer = load_model()
+    print("✅ Model and tokenizer loaded successfully.")
