@@ -1,0 +1,8 @@
+gradio
+transformers
+chromadb
+requests
+langchain
+langgraph
+accelerate
+duckduckgo_search
