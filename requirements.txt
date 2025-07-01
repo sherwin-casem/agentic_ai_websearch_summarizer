@@ -1,4 +1,4 @@
-gradio
+streamlit
 transformers
 chromadb
 requests
@@ -6,3 +6,10 @@ langchain
 langgraph
 accelerate
 duckduckgo_search
+huggingface_hub
+pydantic
+torch
+torchvision
+torchtext
+numpy
+python-dotenv
