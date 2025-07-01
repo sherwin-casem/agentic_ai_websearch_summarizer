@@ -1,21 +1,31 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from duckduckgo_search import DDGS
+from typing import List, Dict
 
-def load_model(model_name="cognitivecomputations/TinyLlama-1.1B-Chat-v1.0"):
+def search_duckduckgo(query: str, num_results: int = 5) -> List[Dict[str, str]]:
     """
-    Load the instruct-tuned LLM model and tokenizer from Hugging Face.
+    Performs a web search using the DuckDuckGo API and returns the results.
 
     Args:
-        model_name (str): The name of the model to load from Hugging Face.
+        query (str): The search query.
+        num_results (int): The number of results to return.
 
     Returns:
-        model: The loaded model.
-        tokenizer: The loaded tokenizer.
+        List[Dict[str, str]]: A list of search results, each containing
+                               a title, URL (href), and snippet (body).
     """
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForCausalLM.from_pretrained(model_name)
-    return model, tokenizer
+    print(f"Searching for '{query}'...")
+    with DDGS() as ddgs:
+        # Using ddgs.text() which is a generator
+        results = [r for r in ddgs.text(query, max_results=num_results)]
+    print(f"Found {len(results)} results.")
+    return results
 
-# Example usage
-if __name__ == "__main__":
-    model, tokenizer = load_model()
-    print("✅ Model and tokenizer loaded successfully.")
+# Example usage:
+if __name__ == '__main__':
+    search_results = search_duckduckgo("What is agentic AI?", num_results=3)
+    if search_results:
+        for result in search_results:
+            print(f"Title: {result['title']}")
+            print(f"URL: {result['href']}")
+            print(f"Snippet: {result['body']}")
+            print("-" * 20)
