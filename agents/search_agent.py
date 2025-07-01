@@ -1,14 +1,14 @@
-from tools.duckduckgo_tool import search_duckduckgo
+# agents/search_agent.py
 
-def search_agent(query):
+from vectorstore.chromadb_setup import search_duckduckgo
+from typing import List, Dict, Any
+
+def search_agent(query: str, num_results: int = 5) -> List[Dict[str, Any]]:
     """
-    Agent that uses the DuckDuckGo tool to perform a web search.
-
-    Args:
-        query (str): The user's search query.
-
-    Returns:
-        list: A list of search result dictionaries.
+    Agent wrapper around DuckDuckGo search.
     """
-    results = search_duckduckgo(query)
+    results = search_duckduckgo(query, max_results=num_results)
+
+    for r in results:
+        r["text"] = r.get("body", "") or r.get("snippet", "")  # Normalize for Chroma
     return results
