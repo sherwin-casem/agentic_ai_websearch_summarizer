@@ -21,7 +21,7 @@ Core Framework: LangGraph (for multi-agent workflows)
 Agent Logic: ReAct (Reason + Act) with verbose logging
 Tool Integration: DuckDuckGo + Summarizer as LangChain tools
 4. Frontend
-Framework: Gradio (lightweight, Lightning AI Studio compatible)
+Framework: Streamlit (lightweight, Lightning AI Studio compatible)
 UI: Simple input box for query, output box for verbose reasoning and final summary
 🔧 Implementation Plan
 ✅ Step 1: Define Tools
@@ -34,7 +34,7 @@ Summarizer Agent: Takes results, summarizes using LLM.
 Define nodes:
 InputNode → SearchAgent → SummarizerAgent → OutputNode
 Use ReAct-style prompts for reasoning steps.
-✅ Step 4: Gradio UI
+✅ Step 4: Streamlit UI
 Input: User query
 Output: Verbose reasoning + final summary
 🧪 Performance Tips
@@ -42,6 +42,18 @@ Use sentence-transformers/all-MiniLM-L6-v2 for fast embedding generation.
 Cache DuckDuckGo results to reduce latency.
 Use LangSmith for debugging and tracing agent steps.
 🚀 Deployment on Lightning AI Studio
-Lightning supports Gradio apps and HuggingFace models.
-Use lightning_app to wrap the Gradio interface.
+Lightning supports Streamlit apps and HuggingFace models.
+Use lightning_app to wrap the Streamlit interface.
 Ensure all dependencies are in requirements.txt.
+
+📦 Installation steps (locally):
+1. Cretae a python virtual environment variable
+   python -m venv env
+2. Activate the env
+   .\env\scripts\activate
+3. Install the dependencies
+   pip install -r requirements.txt
+4. Run the app.py file
+   streamlit run app.py
+
+Or else view the deployed version from here: 
