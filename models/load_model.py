@@ -1,3 +1,5 @@
+# models/load_model.py
+
 import os
 from dotenv import load_dotenv
 import torch
@@ -12,18 +14,17 @@ from transformers.tokenization_utils import PreTrainedTokenizer
 from transformers.modeling_utils import PreTrainedModel
 
 # Load environment variables from .env file
-
 load_dotenv()
-hf_token = os.getenv("HUGGINGFACE_HUB_TOKEN")
 
 TokenizerType = Union[PreTrainedTokenizer, PreTrainedTokenizerFast]
 
 def load_model(
-    model_name: str = "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    # Updated to use the lightweight SmolLM2 model by default
+    model_name: str = "HuggingFaceTB/SmolLM2-135M-Instruct",
     model_type: Literal["causal", "seq2seq"] = "causal",
 ) -> Tuple[Optional[PreTrainedModel], Optional[TokenizerType]]:
     """
-    Load a Hugging Face model and tokenizer using the HUGGINGFACE_HUB_TOKEN from the environment.
+    Load a Hugging Face model and tokenizer, optimized for CUDA.
 
     Args:
         model_name (str): Hugging Face model ID.
@@ -35,44 +36,43 @@ def load_model(
     hf_token = os.getenv("HUGGINGFACE_HUB_TOKEN")
     if not hf_token:
         print("⚠️ HUGGINGFACE_HUB_TOKEN is not set in the environment.")
-        return None, None
+        # Allow loading public models without a token
+        print("Proceeding without a token for public models.")
 
+    # Prioritize CUDA if available, otherwise use CPU
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    torch_dtype = torch.bfloat16 if device == "cuda" and torch.cuda.is_bf16_supported() else "auto"
+    print(f"✅ Using device: {device}")
 
-    tokenizer: TokenizerType = AutoTokenizer.from_pretrained( # type: ignore
-        model_name,
-        token=hf_token,
-        cache_dir="/tmp",
-    )
+    # Use bfloat16 for better performance on modern GPUs, otherwise auto
+    torch_dtype = torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else "auto"
 
-    if model_type == "causal":
-        model: PreTrainedModel = AutoModelForCausalLM.from_pretrained( # type: ignore
+    try:
+        tokenizer: TokenizerType = AutoTokenizer.from_pretrained(
+            model_name,
+            token=hf_token,
+            cache_dir="/tmp/huggingface_cache",
+        )
+
+        model_class = AutoModelForCausalLM if model_type == "causal" else AutoModelForSeq2SeqLM
+        
+        model: PreTrainedModel = model_class.from_pretrained(
             model_name,
             token=hf_token,
             torch_dtype=torch_dtype,
-            device_map="auto",
-            cache_dir="/tmp",
+            device_map=device,  # Pin the model to the selected device
+            cache_dir="/tmp/huggingface_cache",
         )
-    elif model_type == "seq2seq":
-        model: PreTrainedModel = AutoModelForSeq2SeqLM.from_pretrained( # type: ignore
-            model_name,
-            token=hf_token,
-            torch_dtype=torch_dtype,
-            device_map="auto",
-            cache_dir="/tmp",
-        )
-    else:
-        raise ValueError(f"Invalid model_type '{model_type}'. Must be 'causal' or 'seq2seq'.")
 
-    print(f"✅ Loaded {model_type.upper()} model '{model_name}' on {cast(PreTrainedModel, model).device}.")
-    model = cast(Optional[PreTrainedModel], model) # type: ignore
-    tokenizer = cast(Optional[TokenizerType], tokenizer) # type: ignore
-    return model, tokenizer
+        print(f"✅ Loaded {model_type.upper()} model '{model_name}' on {model.device}.")
+        return model, tokenizer
+
+    except Exception as e:
+        print(f"🚫 Error loading model: {e}")
+        return None, None
 
 # Example usage
 if __name__ == "__main__":
-    print("--- Loading Causal LM ---")
+    print("--- Loading Causal LM (SmolLM2) ---")
     model, tokenizer = load_model(model_type="causal")
     if model and tokenizer:
         print(f"Model: {model.__class__.__name__}")
