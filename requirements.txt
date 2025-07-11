@@ -1,15 +1,23 @@
+# requirements.txt
+
+# --- Core App & UI ---
 streamlit
-transformers
-chromadb
-requests
+python-dotenv
+
+# --- AI & LangChain ---
 langchain
 langgraph
+transformers
 accelerate
-duckduckgo_search
 huggingface_hub
+
+# --- Data & Search ---
+ddgs
+chromadb
 pydantic
+numpy
+
+# --- PyTorch (CPU version for cloud deployment) ---
 torch
 torchvision
-torchtext
-numpy
-python-dotenv
+torchaudio
